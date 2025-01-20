@@ -39,7 +39,7 @@ class Settings(models.Model):
         verbose_name_plural = "Settings"
 
     title = models.CharField(max_length=255,default="Drummerei")
-    subtitle = models.CharField(max_length=255,null=True,blank=True)
+    subtitle = models.CharField(max_length=255,default="Open Decks Timetable")
     url = models.CharField(max_length=255,null=True,blank=True)
 
     def save(self,*args, **kwargs):
