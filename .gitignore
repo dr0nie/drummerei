@@ -3,3 +3,4 @@
 db.sqlite3
 drummerei/static/image/*.png
 __pycache__/
+static
