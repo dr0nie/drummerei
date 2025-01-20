@@ -9,6 +9,11 @@ class SlotAdmin(admin.ModelAdmin):
     get_schedule.short_description = 'Schedule'
     
 
+class ScheduleAdmin(admin.ModelAdmin):
+    # list_display = ('name', 'start_time', 'get_schedule')
+    filter_horizontal = ('slots',)
+
+    
 admin.site.register(Slot,SlotAdmin)
-admin.site.register(Schedule)
+admin.site.register(Schedule,ScheduleAdmin)
 admin.site.register(Settings)
