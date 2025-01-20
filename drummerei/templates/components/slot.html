@@ -1,7 +1,7 @@
 <div class="form-group row row-gap-2 gap-3 pt-3 fw-bold">
 
     <div class="col-3 p-2 bg-white text-black border border-black border-4 fs-4 rounded">
-        {{slot.time|date:"H:i"}}
+        {{slot.start_time|date:"H:i"}}
     </div>
 
     {% if not kiosk %}
@@ -31,7 +31,7 @@
         </div>
         {% endif %}
 
-        {% if not slot.time %}
+        {% if not slot.start_time %}
             {% if not slot.slot_id %}
 
                 <div class="col-1 p-0">

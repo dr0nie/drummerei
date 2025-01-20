@@ -1,11 +1,16 @@
+from random import randint
+from datetime import time, timedelta,datetime
 from typing import Iterable, Optional
 from django.db import models
-from random import randint
 import qrcode
+
+
+def generate_start_time():
+    return Settings.load().default_start_time
 
 class Slot(models.Model):
     name = models.CharField(max_length=255)
-    time = models.DateTimeField()
+    start_time = models.TimeField(default=generate_start_time)
     slot_id = models.UUIDField(null=True,blank=True)
 
     def __str__(self) -> str:
@@ -21,11 +26,34 @@ def generate_pin() -> int:
     generate_qrcode(pin)
     return pin
 
+def generate_slots():
+    number_of_slots = int(
+        Settings.load().default_duration.total_seconds() / Settings.load().default_slot_duration.total_seconds()
+    )
+    slots = []
+    for i in range(number_of_slots):
+        slot = Slot(
+                start_time=(
+                    datetime.combine(
+                        datetime(1,1,1),
+                        generate_start_time()
+                    ) + timedelta(minutes=i*30)
+                    ).time()
+                )
+        slot.save()
+        slots.append(slot)
+    return slots
+
 class Schedule(models.Model):
-    slots = models.ManyToManyField(Slot,null=True,blank=True)
+    slots = models.ManyToManyField(Slot,default=generate_slots,null=True,blank=True)
     pin = models.IntegerField(default=generate_pin)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
+    def delete(self):
+        for slot in self.slots.all():
+            slot.delete()
+        super().delete()
 
     def save(self):
         schedules=list(self.__class__.objects.filter(id=self.id))
@@ -46,6 +74,10 @@ class Settings(models.Model):
     title = models.CharField(max_length=255,default="Drummerei")
     subtitle = models.CharField(max_length=255,default="Open Decks Timetable")
     url = models.CharField(max_length=255,null=True,blank=True)
+
+    default_start_time = models.TimeField(default=time(20,0))
+    default_duration = models.DurationField(default=timedelta(hours=4))
+    default_slot_duration = models.DurationField(default=timedelta(minutes=30))
 
     def save(self,*args, **kwargs):
         self.pk=1

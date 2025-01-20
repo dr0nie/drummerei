@@ -1,6 +1,14 @@
 from django.contrib import admin
 from .models import Slot, Schedule, Settings
 
-admin.site.register(Slot)
+class SlotAdmin(admin.ModelAdmin):
+    list_display = ('name', 'start_time', 'get_schedule')
+
+    def get_schedule(self, obj):
+        return obj.schedule_set.all().first()
+    get_schedule.short_description = 'Schedule'
+    
+
+admin.site.register(Slot,SlotAdmin)
 admin.site.register(Schedule)
 admin.site.register(Settings)
