@@ -1,0 +1,57 @@
+<div class="form-group row row-gap-2 gap-4 pt-3 fw-bold">
+
+    <div class="col-3 p-2 bg-white text-black border border-black border-4 fs-4 rounded">
+        {{slot.time|date:"H:i"}}
+    </div>
+
+    {% if not kiosk %}
+        {% if slot.slot_id|slugify == slot_id_from_cookies %}
+            <div class="col p-0 input-group">
+                <input  type="text"
+                class="form-control text-center fs-4 fw-bold text-black border border-black border-4"
+                placeholder="Name"
+                aria-label="Name"
+                aria-describedby="basic-addon1"
+                value="{{slot.name}}"
+                >
+
+                <button class="btn btn-dark text-danger fw-bold"
+                        type="button"
+                        onclick="()=>{
+                                fetch('tst')
+                        }"
+                >
+                CLEAR
+                </button>
+            </div>
+
+        {% else %}
+        <div class="col bg-white p-2 text-dark fs-4 rounded border border-black border-4">
+            {{slot.name}}
+        </div>
+        {% endif %}
+
+        {% if not slot.time %}
+            {% if not slot.slot_id %}
+
+                <div class="col-1 p-0">
+
+                    <button class="btn btn-dark fw-bold"
+                            type="button"
+                            onclick="()=>{
+                                    fetch('tst')
+                            }"
+                    >
+                    HOLD
+                    </button>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% else %}
+
+    <div class="col p-2 bg-white text-dark fs-4 rounded">
+        {{slot.name}}
+    </div>
+    {% endif %}
+</div>

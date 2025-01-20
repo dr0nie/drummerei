@@ -1,0 +1,17 @@
+{% extends "../layout.html" %}
+    
+{% block content %}
+
+    <div class="row">
+      <div class="col">
+
+        <h2>Next Dates</h2>
+
+      {%for schedule in schedules %}
+          {% include "../components/date.html" %}
+      {%endfor%}
+    
+      </div>
+    </div>
+
+{% endblock %}
