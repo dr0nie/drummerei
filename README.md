@@ -35,7 +35,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/drummerei.git
+   git clone https://github.com/dr0nie/drummerei.git
 
 2. install dependencies:
    ```bash
