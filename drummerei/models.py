@@ -38,7 +38,7 @@ class Settings(models.Model):
     class Meta:
         verbose_name_plural = "Settings"
 
-    title = models.CharField(max_length=255,null=True,blank=True)
+    title = models.CharField(max_length=255,default="Drummerei")
     subtitle = models.CharField(max_length=255,null=True,blank=True)
     url = models.CharField(max_length=255,null=True,blank=True)
 
