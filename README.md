@@ -44,4 +44,5 @@ These instructions will get you a copy of the project up and running on your loc
 
 3. run app with development server:
    ```bash
+   python migrate
    python manage.py runserver
