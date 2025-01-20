@@ -40,9 +40,13 @@ These instructions will get you a copy of the project up and running on your loc
 2. install dependencies:
    ```bash
    python -m venv .venv
+   source .venv/bin/activate
    pip install -r requirements.txt
 
 3. run app with development server:
    ```bash
-   python migrate
+   source .venv/bin/activate
+   sh create_env.sh # create SECRET_KEY env variable
+   python migrate # initialize database schema
+   python createsuperuser # create admin user
    python manage.py runserver
