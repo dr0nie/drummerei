@@ -51,7 +51,7 @@ class Schedule(models.Model):
     end_time = models.DateTimeField()
 
     def delete(self):
-        for slot in self.slots.all():
+        for slot in list(self.slots.all()):
             slot.delete()
         super().delete()
 
