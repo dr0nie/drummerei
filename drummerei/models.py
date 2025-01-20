@@ -28,7 +28,12 @@ class Schedule(models.Model):
     end_time = models.DateTimeField()
 
     def save(self):
-        generate_qrcode(self.pin)
+        schedules=list(self.__class__.objects.filter(id=self.id))
+        if len(schedules) == 1:
+            old_schedule = schedules[0]
+            oldpin = old_schedule.pin
+            if self.pin != oldpin:
+                generate_qrcode(self.pin)
         super().save()
 
     def __str__(self) -> str:
