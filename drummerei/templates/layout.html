@@ -1,25 +1,26 @@
 {% load static %}
+
 <html>
     
-{% include "./head.html" %}
+    {% include "./head.html" %}
 
     <body class="container-background">
-            <div class="container text-white">
+       
+        <div class="container text-white">
             
-            
-          {% include "./components/header.html" %}
-
+            {% include "./components/header.html" %}
 
             <main class="container text-center text-white">
                 {% block content %}
                 {% endblock %}
             </main>   
        
-       
-        {% include "./components/footer.html" %}
+            {% include "./components/footer.html" %}
 
+        </div>
 
-    </div>
-    <script src="/static/js/bootstrap.min.js"></script>
-</body>
+        <script src="/static/js/bootstrap.min.js"></script>
+
+    </body>
+
 </html>
