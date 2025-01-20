@@ -14,7 +14,7 @@ class Slot(models.Model):
     slot_id = models.UUIDField(null=True,blank=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.schedule_set.all().first()} @ {self.start_time}: {self.name}"
 
 def generate_qrcode(pin:int):
     data = f"https://{Settings.load().url}?pin={pin}"
@@ -44,6 +44,7 @@ def generate_slots():
         slots.append(slot)
     return slots
 
+#TODO: use signals after save
 class Schedule(models.Model):
     slots = models.ManyToManyField(Slot,default=generate_slots,null=True,blank=True)
     pin = models.IntegerField(default=generate_pin)
