@@ -19,6 +19,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### TODO
 - ORM: correct times of slots
+- View: fill future slots
 - QR: correct data
 - UI: click events and post requests
 - UI: hold button layout
@@ -26,7 +27,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 * Python 3.7+
-* Django, qrcode, python-dotenv
+* Django, qrcode, python-dotenv for SECRET_KEY
 * Virtual environment manager (venv recommended)
 * SQLite
 
