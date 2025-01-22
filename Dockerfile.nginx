@@ -1,0 +1,40 @@
+FROM nginx:alpine
+
+RUN apk add --no-cache certbot certbot-nginx
+
+COPY ./static /usr/share/nginx/www/
+
+RUN echo '\
+    server { \
+        listen 80; \
+        server_name localhost; \
+        return 301 https://$host$request_uri; \
+    } \
+    server { \
+        listen 443 ssl; \
+        server_name localhost; \
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt; \
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key; \
+        location / { \
+            proxy_pass http://localhost:8000; \
+            proxy_set_header Host $host; \
+            proxy_set_header X-Real-IP $remote_addr; \
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
+            proxy_set_header X-Forwarded-Proto $scheme; \
+        } \
+    }' > /etc/nginx/conf.d/default.conf
+
+# Obtain a wildcard SSL certificate using DNS challenge
+# Note: You need to replace "yourdomain.com" with your actual domain
+# and ensure that you have access to automate DNS record updates for validation.
+# This example assumes using a DNS plugin, replace `dns-plugin` with the actual plugin name.
+RUN certbot certonly --non-interactive --agree-tos --email your-email@example.com \
+    --dns-dns-plugin \
+    --dns-dns-plugin-credentials /path/to/credentials.ini \
+    --dns-dns-plugin-propagation-seconds 30 \
+    -d "*.yourdomain.com" -d "yourdomain.com"
+
+RUN ln -s /etc/letsencrypt/live/yourdomain.com/fullchain.pem /etc/ssl/certs/nginx-selfsigned.crt && \
+    ln -s /etc/letsencrypt/live/yourdomain.com/privkey.pem /etc/ssl/private/nginx-selfsigned.key
+
+CMD ["nginx -g 'daemon off;'"]
