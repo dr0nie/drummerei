@@ -5,28 +5,93 @@ import qrcode
 from django.db import models
 
 class Settings(models.Model):
+    """
+    Application settings.
+
+    This model is used to store various configuration settings for the application.
+    It includes fields for title, subtitle, URL, default QR code path, start time,
+    duration, and slot duration. The settings are loaded or created with a fixed
+    primary key to ensure a singleton pattern.
+
+    Attributes:
+        title (str): The title of the application.
+        subtitle (str): A subtitle for the application.
+        url (str): The URL associated with the application.
+        default_qr_code_path (str): The default path for storing QR code images.
+        default_start_time (time): The default start time for slots.
+        default_duration (timedelta): The default duration for schedules.
+        default_slot_duration (timedelta): The default duration for individual slots.
+    """
+
     class Meta:
         verbose_name_plural = "Settings"
 
-    title = models.CharField(max_length=255,default="Drummerei")
-    subtitle = models.CharField(max_length=255,default="Open Decks Timetable")
-    url = models.CharField(max_length=255,null=True,blank=True)
-
-    default_qr_code_path = models.CharField(max_length=255, default="drummerei/static/image/qr.png")
-    default_start_time = models.TimeField(default=time(20,0))
-    default_duration = models.DurationField(default=timedelta(hours=4))
-    default_slot_duration = models.DurationField(default=timedelta(minutes=30))
-
+    title = models.CharField(
+        max_length=255,
+        default="Drummerei",
+        help_text="The title of the application."
+    )
+    subtitle = models.CharField(
+        max_length=255,
+        default="Open Decks Timetable",
+        help_text="A subtitle for the application."
+    )
+    url = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="The URL associated with the application."
+    )
+    default_qr_code_path = models.CharField(
+        max_length=255,
+        default="drummerei/static/image/qr.png",
+        help_text="The default path for storing QR code images."
+    )
+    default_start_time = models.TimeField(
+        default=time(20, 0),
+        help_text="The default start time for slots."
+    )
+    default_duration = models.DurationField(
+        default=timedelta(hours=4),
+        help_text="The default duration for schedules."
+    )
+    default_slot_duration = models.DurationField(
+        default=timedelta(minutes=30),
+        help_text="The default duration for individual slots."
+    )
     @classmethod
     def load(cls):
+        """
+        Loads or creates the settings instance.
+
+        This class method ensures that the settings instance is loaded or created
+        with a fixed primary key to maintain a singleton pattern.
+        Returns:
+            Settings: The settings instance.
+        """
         obj, _ = cls.objects.get_or_create(id=1)
         return obj
     
-    def save(self,*args, **kwargs):
-        self.pk=1
+    def save(self, *args, **kwargs):
+        """
+        Saves the settings instance.
+
+        Overrides the default save method to ensure the settings instance always
+        has a fixed primary key, maintaining a singleton pattern.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
+        self.pk = 1
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
+        """
+        Returns the string representation of the settings instance.
+        Returns:
+            str: The title of the settings instance.
+        """
         return self.title
 
 
@@ -70,21 +135,43 @@ def generate_pin() -> int:
     return pin
 
 class Schedule(models.Model):
-    slots = models.ManyToManyField(Slot,editable=False)
+    """
+    Represents a schedule containing multiple slots.
+
+    This model defines a schedule with slots, a unique pin, a start time, and an end time.
+    It also provides methods to generate a QR code, manage slots, and handle URL generation
+    with a pin for the schedule.
+
+    Attributes:
+        slots (ManyToManyField): A many-to-many relationship with the Slot model.
+        pin (IntegerField): A randomly generated 4-digit pin for the schedule.
+        start_time (DateTimeField): The start time of the schedule.
+        end_time (DateTimeField): The end time of the schedule.
+    """
+    slots = models.ManyToManyField(Slot, editable=False)
     pin = models.IntegerField(default=generate_pin)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
     def save(self):
-        #TODO: put qrcode path in Settings
+        """
+        Saves the schedule instance.
+
+        Overrides the default save method to generate a QR code and associate slots
+        with the schedule. If the schedule is new, it generates slots and a QR code.
+        If the pin changes, it regenerates the QR code.
+
+        Returns:
+            None
+        """
+        # TODO: put qrcode path in Settings
         qrcode_path = Settings.load().default_qr_code_path
         if self.id is None:
             self.generate_qrcode(qrcode_path)
             super().save()            
             self.slots.add(*self.__generate_slots())
-
         else:
-            schedules=list(self.__class__.objects.filter(id=self.id))
+            schedules = list(self.__class__.objects.filter(id=self.id))
             old_schedule = schedules[0]
             oldpin = old_schedule.pin
             if self.pin != oldpin:
@@ -93,35 +180,80 @@ class Schedule(models.Model):
         return super().save()
 
     def delete(self):
+        """
+        Deletes the schedule instance.
+
+        Overrides the default delete method to remove all associated slots
+        before deleting the schedule itself.
+
+        Returns:
+            None
+        """
         for slot in list(self.slots.all()):
             slot.delete()
         super().delete()
 
-    def generate_url_with_pin(self):
+    def generate_url_with_pin(self) -> str:
+        """
+        Generates a URL with the schedule's pin.
+
+        Constructs a URL using the base URL from the Settings model and appends
+        the schedule's pin as a query parameter.
+
+        Returns:
+            str: The generated URL with the pin.
+        """
         return f"{Settings.load().url}?pin={self.pin}"
 
-    def generate_qrcode(self,path:str):
+    def generate_qrcode(self, path: str):
+        """
+        Generates a QR code for the schedule.
+
+        Creates a QR code containing the URL with the schedule's pin and saves
+        it to the specified path.
+
+        Args:
+            path (str): The file path where the QR code image will be saved.
+
+        Returns:
+            None
+        """
         data = self.generate_url_with_pin()
         img = qrcode.make(data)
         img.save(path)
 
     def __str__(self) -> str:
+        """
+        Returns the string representation of the schedule instance.
+
+        Returns:
+            str: The date part of the schedule's start time.
+        """
         return str(self.start_time.date())
     
     def __generate_slots(self) -> list[Slot]:
+        """
+        Generates slots for the schedule.
+
+        Uses the default duration and slot duration from the Settings model to
+        create and save individual Slot instances for the schedule.
+
+        Returns:
+            list[Slot]: A list of generated Slot instances.
+        """
         number_of_slots = int(
             Settings.load().default_duration.total_seconds() / Settings.load().default_slot_duration.total_seconds()
         )
         slots = []
         for i in range(number_of_slots):
             slot = Slot(
-                    start_time=(
-                        datetime.combine(
-                            datetime(1,1,1),
-                            Settings.load().default_start_time
-                        ) + timedelta(minutes=i*30)
-                        ).time()
-                    )
+                start_time=(
+                    datetime.combine(
+                        datetime(1, 1, 1),
+                        Settings.load().default_start_time
+                    ) + timedelta(minutes=i * 30)
+                ).time()
+            )
             slot.save()
             slots.append(slot)
         return slots
