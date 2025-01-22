@@ -26,6 +26,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 * Python 3.7+
 * Django, qrcode, python-dotenv for SECRET_KEY
+* pyzbar for testing QR code, needs zbar installed on system
 * Virtual environment manager (venv recommended)
 * SQLite
 

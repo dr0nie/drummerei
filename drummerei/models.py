@@ -12,6 +12,7 @@ class Settings(models.Model):
     subtitle = models.CharField(max_length=255,default="Open Decks Timetable")
     url = models.CharField(max_length=255,null=True,blank=True)
 
+    default_qr_code_path = models.CharField(max_length=255, default="drummerei/static/image/qr.png")
     default_start_time = models.TimeField(default=time(20,0))
     default_duration = models.DurationField(default=timedelta(hours=4))
     default_slot_duration = models.DurationField(default=timedelta(minutes=30))
@@ -76,7 +77,7 @@ class Schedule(models.Model):
 
     def save(self):
         #TODO: put qrcode path in Settings
-        qrcode_path = "drummerei/static/image/qr.png"
+        qrcode_path = Settings.load().default_qr_code_path
         if self.id is None:
             self.generate_qrcode(qrcode_path)
             super().save()            
