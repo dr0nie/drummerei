@@ -1,0 +1,11 @@
+static
+.venv
+.env
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+.dockerignore
+db.sqlite3
+__pycache__/
+drummerei/static/image/*.png
