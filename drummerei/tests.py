@@ -29,6 +29,7 @@ class ScheduleModelTest(TestCase):
         self.end_time=self.start_time + timedelta(hours=4)
 
         self.settings = Settings.load()
+        self.settings.default_qr_code_path = "drummerei/static/image/test.png"
         self.settings.url = "http://localhost:8000"
         self.settings.save()
         self.schedule = Schedule(
@@ -44,7 +45,12 @@ class ScheduleModelTest(TestCase):
         )
 
     def test_generate_qrcode(self):
-        self.assertTrue(False, 'Not implemented')
+        from PIL import Image
+        from pyzbar import pyzbar
+
+        img = Image.open(Settings.load().default_qr_code_path)
+        output = pyzbar.decode(img)[0].data.decode("utf-8")
+        self.assertEqual(output, self.schedule.generate_url_with_pin())
 
     def test_schedule_creation(self):
         self.assertEqual(self.schedule.start_time, self.start_time)

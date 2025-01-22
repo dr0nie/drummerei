@@ -1,6 +1,9 @@
 asgiref==3.8.1
-Django==5.1.5
+Django
+gunicorn==23.0.0
+packaging==24.2
 pillow==11.1.0
 python-dotenv==1.0.1
+pyzbar==0.1.9
 qrcode==8.0
 sqlparse==0.5.3
