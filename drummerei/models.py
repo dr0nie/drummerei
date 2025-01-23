@@ -164,7 +164,6 @@ class Schedule(models.Model):
         Returns:
             None
         """
-        # TODO: put qrcode path in Settings
         qrcode_path = Settings.load().default_qr_code_path
         if self.id is None:
             self.generate_qrcode(qrcode_path)
