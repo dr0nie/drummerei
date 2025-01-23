@@ -2,13 +2,9 @@ from datetime import datetime, timedelta
 
 from django.test import TestCase
 
-from .models import (
-    Settings,
-    Schedule,
-    Slot,
-    generate_pin,
-    generate_start_time
-)
+from .models.settings import Settings
+from .models.slot import Slot, generate_start_time
+from .models.schedule import Schedule, generate_pin
 
 class HelperFunctionsTest(TestCase):
     def test_generate_pin(self):
@@ -36,7 +32,7 @@ class SlotModelTest(TestCase):
         self.name = "TestDJ"
         self.start_time = datetime.now()
 
-        self.slot = Slot(
+        self.slot = Slot.objects.create(
             name=self.name,
             start_time=self.start_time,
         )
@@ -80,11 +76,10 @@ class ScheduleModelTest(TestCase):
         self.settings.default_qr_code_path = "drummerei/static/image/test.png"
         self.settings.url = "http://localhost:8000"
         self.settings.save()
-        self.schedule = Schedule(
+        self.schedule = Schedule.objects.create(
             start_time=self.start_time,
             end_time=self.end_time,
         )
-        self.schedule.save()
 
     def test_creation(self):
         self.assertEqual(self.schedule.start_time, self.start_time)

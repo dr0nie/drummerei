@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Slot, Schedule, Settings
+from .models.settings import Settings
+from .models.slot import Slot
+from .models.schedule import Schedule
 
 class SlotAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_time', 'get_schedule')

@@ -3,7 +3,8 @@ import uuid
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import Schedule, Settings
+from .models.settings import Settings
+from .models.schedule import Schedule
 
 def home(request) -> HttpResponse:
     context = {
@@ -35,7 +36,6 @@ def create_context_for_schedule(date:str,pin:str,slotId:uuid.UUID) -> dict:
 
 
 def schedule(request,date:str) -> HttpResponse:
-
     slotId = request.COOKIES.get('drummerei_slotId')   
     if not slotId:
         slotId = uuid.uuid4()
