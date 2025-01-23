@@ -144,6 +144,28 @@ class Slot(models.Model):
         self.save()
         return self.slot_id
 
+    def clear_slot_with_id(self, slot_id: UUID):
+        """
+        Clears the unique identifier and name for the slot with the given ID.
+
+        This method checks if the given slot_id matches the slot's ID, and if so,
+        resets the name and slot_id to None, effectively clearing the slot.
+        The changes are then saved to the database.
+
+        Args:
+            slot_id (UUID): The ID of the slot to clear.
+
+        Returns:
+            None
+        Raises:
+            ValueError: If the slot ID does not match the current slot's ID.
+        """
+        if self.slot_id == slot_id:
+            self.clear_slot()
+            self.save()
+        else:
+            raise ValueError("Slot ID does not match")
+        
     def clear_slot(self):
         """
         Clears the unique identifier and name for the slot.

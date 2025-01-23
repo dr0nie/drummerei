@@ -52,17 +52,23 @@ class SlotModelTest(TestCase):
         )
 
     def test_reserve(self):
-        #TODO: implement test
         name = "TestDJ & TestMC"
         uuid = self.slot.reserve(name)
         self.assertNotEqual(uuid, None)
         self.assertEqual(self.slot.name, name)
 
     def test_clear_slot(self):
-        #TODO: implement test
-        uuid = self.slot.clear_slot()
+        self.slot.clear_slot()
         self.assertEqual(self.slot.name,None)
         self.assertEqual(self.slot.slot_id,None)
+
+    def test_clear_slot_with_id(self):
+        from uuid import uuid4
+        name = "TestDJ & TestMC"
+        uuid = self.slot.reserve(name)
+        self.assertRaises(ValueError,self.slot.clear_slot_with_id,uuid4())
+        self.assertEqual(self.slot.name,name)
+        self.assertEqual(self.slot.slot_id,uuid)
 
 
 class ScheduleModelTest(TestCase):
