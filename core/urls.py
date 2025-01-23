@@ -8,6 +8,9 @@ from django.conf.urls.static import static
 from drummerei.urls import urlpatterns as drummerei_urls
 
 urlpatterns = [
+    path('admin/doc/', include(
+        'django.contrib.admindocs.urls'
+    )),
     path('admin/', admin.site.urls),
     path('', include(drummerei_urls)),
 ] + static(
