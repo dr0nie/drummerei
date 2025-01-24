@@ -88,7 +88,7 @@ class Schedule(models.Model):
         Returns:
             str: The generated URL with the pin.
         """
-        return f"{Settings.load().url}?pin={self.pin}"
+        return f"{Settings.load().url}/{self}?pin={self.pin}"
 
     def generate_qrcode(self, path: str):
         """
