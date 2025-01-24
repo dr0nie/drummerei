@@ -36,8 +36,7 @@ class Settings(models.Model):
     )
     url = models.CharField(
         max_length=255,
-        null=True,
-        blank=True,
+        default="http://druckse/ledwand",
         help_text="The URL associated with the application."
     )
     default_qr_code_path = models.CharField(
