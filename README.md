@@ -45,7 +45,7 @@ These instructions will get you a copy of the project up and running on your loc
 3. run app with development server:
    ```bash
    source .venv/bin/activate
-   sh create_env.sh # create SECRET_KEY env variable
-   python migrate # initialize database schema
-   python createsuperuser # create admin user
+   sh create_env.sh # create .env file with SECRET_KEY environment variable
+   python manage.py migrate # initialize database schema
+   python manage.py createsuperuser # create admin user
    python manage.py runserver
