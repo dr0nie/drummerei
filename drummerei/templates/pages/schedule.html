@@ -1,7 +1,6 @@
 {% extends "../layout.html" %}
 
 {%block content %}
-
 <div class="row row-gap-2 gap-3">
     <div class="col-3 p-2 bg-black text-uppercase fs-4 fw-bold rounded">
     Time
@@ -12,16 +11,7 @@
 </div>
 
 {% for slot in schedule.slots.all %}
-  {% include "../components/slot.html" %}
-{% endfor %}
-
-
-{% if not kiosk %}
-    {% include "../components/add_slot.html" %}
-{% endif %}
-
-{% for i in range_slots_left %}
-  {% include "../components/slot.html" %}
+  {% include "../components/slot/layout.html" %}
 {% endfor %}
 
 {% endblock %}

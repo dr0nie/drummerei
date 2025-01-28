@@ -1,0 +1,19 @@
+<form   method="POST"
+        action="/{{schedule}}/slots/{{slot.id}}/reserve"
+        class="col p-0 m-0 input-group">
+        {% csrf_token %}
+        <input  type="text" disabled
+        class="form-control text-center fs-4 fw-bold text-black border border-black border-4"
+        aria-label="Name"
+        aria-describedby="basic-addon1"
+        value="{% if slot.name %}{{slot.name}}{% endif %}"
+        name="name"
+        >
+        <input type="hidden" name="pin" value="{{schedule.pin}}"/>
+    
+        <button class="btn btn-dark text-info fw-bold"
+                type="submit" disabled
+        >
+        LOCKED
+        </button>
+</form>

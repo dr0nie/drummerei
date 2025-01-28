@@ -1,11 +1,20 @@
 from random import randint
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime,time
 import qrcode
 
 from django.db import models
 
 from .settings import Settings
 from .slot import Slot
+
+
+def generate_start_time() -> datetime:
+    today = datetime.today()
+    start = datetime.combine(today, Settings.load().default_start_time)
+    return start
+
+def generate_end_time() -> datetime:
+    return generate_start_time() + Settings.load().default_duration
 
 
 def generate_pin() -> int:
@@ -37,8 +46,8 @@ class Schedule(models.Model):
     """
     slots = models.ManyToManyField(Slot, editable=False)
     pin = models.IntegerField(default=generate_pin)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateTimeField(default=generate_start_time)
+    end_time = models.DateTimeField(default=generate_end_time)
 
     def save(self, *args, **kwargs):
         """

@@ -1,7 +1,8 @@
+import datetime
 import uuid
 
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from .models.settings import Settings
 from .models.schedule import Schedule
@@ -14,11 +15,14 @@ def home(request) -> HttpResponse:
 
 
 def create_context_for_schedule(date:str,pin:str,slotId:uuid.UUID) -> dict:
+    now =  datetime.datetime.now() + datetime.timedelta(hours=Settings.load().unlock_hours)
     context = {
         "kiosk":True,
         # "range_add_slots":range(2),
         "slot_id_from_cookies":slotId,
-        "site":Settings.load()
+        "site":Settings.load(),
+        # "now":datetime.datetime.now() + datetime.timedelta(hours=1)
+        "now":datetime.time(hour=now.hour,minute=now.minute)
     }
 
     schedules = list(Schedule.objects.filter(start_time__date=date))
@@ -46,3 +50,23 @@ def schedule(request,date:str) -> HttpResponse:
     response.set_cookie('drummerei_slotId', slotId)
 
     return response
+
+def clear_slot(request,date:str,slot_id:int) -> HttpResponse:
+    schedule = Schedule.objects.get(start_time__date=date)
+    slot = schedule.slots.get(id=slot_id)
+    slot.name = None
+    slot.slot_id = None
+    slot.save()
+    return HttpResponseRedirect(
+        redirect_to=f"/{date}?pin={request.POST.get("pin")}"
+    )
+
+def reserve_slot(request,date:str,slot_id:int) -> HttpResponse:
+    schedule = Schedule.objects.get(start_time__date=date)
+    slot = schedule.slots.get(id=slot_id)
+    slot.name = request.POST.get("name")
+    slot.slot_id = request.COOKIES.get('drummerei_slotId')
+    slot.save()
+    return HttpResponseRedirect(
+        redirect_to=f"/{date}?pin={request.POST.get("pin")}"
+    )

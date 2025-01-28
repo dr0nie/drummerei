@@ -37,6 +37,10 @@ class Slot(models.Model):
     start_time = models.TimeField(default=generate_start_time)
     slot_id = models.UUIDField(null=True, blank=True)
 
+    def is_locked(self) -> bool:
+        number_available_slots=2
+        return False
+
     def reserve(self, name: str) -> UUID:
         """
         Reserves the slot with the given name and generates a unique identifier.

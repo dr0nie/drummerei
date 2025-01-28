@@ -56,6 +56,10 @@ class Settings(models.Model):
         default=timedelta(minutes=30),
         help_text="The default duration for individual slots."
     )
+    unlock_hours = models.IntegerField(
+        default=1,
+        help_text="The number of hours before the start time when slots can be unlocked."
+    )
 
     @classmethod
     def load(cls):
