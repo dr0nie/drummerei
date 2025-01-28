@@ -18,9 +18,7 @@ These instructions will get you a copy of the project up and running on your loc
 - automatically creates a QR code from PIN
 
 ### TODO
-- QR: correct data
-- UI: click events and post requests
-- UI: hold button layout
+- UI: make slots uneditable for users that already have a slot
 
 ### Prerequisites
 
