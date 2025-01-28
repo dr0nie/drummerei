@@ -93,7 +93,7 @@ class ScheduleModelTest(TestCase):
     def test_generate_url_with_pin(self):
         self.assertEqual(
             self.schedule.generate_url_with_pin(),
-            self.settings.url+"?pin="+str(self.schedule.pin)
+            f"{self.settings.url}/{self.schedule}?pin={self.schedule.pin}"
         )
 
     def test_generate_qrcode(self):
