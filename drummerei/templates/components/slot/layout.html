@@ -1,0 +1,37 @@
+<div class="form-group row row-gap-2 gap-3 pt-3 fw-bold">
+
+    <div class="col-3 p-2 bg-white text-black border border-black border-4 fs-4 rounded">
+        {{slot.start_time|date:"H:i"}}
+    </div>
+
+    {% if kiosk %}
+        <div class="col p-2 bg-white text-dark fs-4 rounded border border-black border-4">
+            {{slot.name}}
+        </div>
+    {% else %}
+
+        {% if slot.start_time < now  %}
+            <div class="col p-0 m-0">
+                {% include './form_locked.html' %}
+            </div>
+        {% else %}
+
+            {% if slot.slot_id|slugify == slot_id_from_cookies %}    
+                <div class="col p-0 m-0">
+                    {% include './form_clear.html' %}
+                </div>
+            {% else %}
+                {% if slot.slot_id != None %}
+                    <div class="col p-2 bg-white text-dark fs-4 rounded border border-black border-4">
+                        {{slot.name}}
+                    </div>
+                {% else %}
+                    <div class="col p-0 m-0">
+                        {% include './form_reserve.html' %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+</div>

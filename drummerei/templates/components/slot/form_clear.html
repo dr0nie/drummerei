@@ -1,0 +1,21 @@
+<form   method="POST"
+        action="/{{schedule}}/slots/{{slot.id}}/clear"
+        class="col p-0 m-0 input-group">
+    {% csrf_token %}
+    <input  type="text"
+            class="form-control text-center fs-4 fw-bold text-black border border-black border-4"
+            placeholder="Name"
+            aria-label="Name"
+            aria-describedby="basic-addon1"
+            value="{{slot.name}}"
+            name="name"
+    />
+    <input type="hidden" name="time" value="{{slot.start_time|date:'H:i'}}"/>
+    <input type="hidden" name="pin" value="{{schedule.pin}}"/>
+
+    <button class="btn btn-dark text-danger fw-bold"
+            type="submit"
+    >
+    CLEAR
+    </button>
+</form>

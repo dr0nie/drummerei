@@ -8,7 +8,9 @@
        
         <div class="container text-white">
             
-            {% include "./components/header.html" %}
+            {% block header %}
+                {% include "./components/header.html" %}
+            {% endblock %}
 
             <main class="container text-center text-white">
                 {% block content %}
