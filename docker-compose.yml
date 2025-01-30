@@ -2,7 +2,6 @@ version: '3'
 
 services:
   nginx:
-    image: nginx:alpine
     build:
       dockerfile: Dockerfile.nginx
     ports:

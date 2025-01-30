@@ -13,7 +13,7 @@ COPY . .
 
 RUN sh create_env.sh
 RUN python manage.py migrate
-RUN python manage.py createsuperuser --noinput --username admin
+RUN python manage.py createsuperuser --noinput --username admin --email ""
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
