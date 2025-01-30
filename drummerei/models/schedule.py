@@ -30,6 +30,9 @@ def generate_pin() -> int:
     pin = randint(1000,9999)
     return pin
 
+def generate_unlock_hours() -> int:
+    return Settings.load().default_unlock_hours
+
 class Schedule(models.Model):
     """
     Represents a schedule containing multiple slots.
@@ -48,6 +51,7 @@ class Schedule(models.Model):
     pin = models.IntegerField(default=generate_pin)
     start_time = models.DateTimeField(default=generate_start_time)
     end_time = models.DateTimeField(default=generate_end_time)
+    unlock_hours = models.IntegerField(default=generate_unlock_hours)
 
     def save(self, *args, **kwargs):
         """
@@ -71,7 +75,12 @@ class Schedule(models.Model):
             oldpin = old_schedule.pin
             if self.pin != oldpin:
                 self.generate_qrcode(qrcode_path)
-                super().save(*args, **kwargs)
+
+            old_end_time = old_schedule.end_time
+            if self.end_time != old_end_time:
+                #TODO: update slots
+                pass
+            super().save(*args, **kwargs)
 
     def delete(self):
         """

@@ -1,8 +1,10 @@
 import datetime
 import uuid
 
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+
+from drummerei.forms import ReserveSlotForm
 
 from .models.settings import Settings
 from .models.schedule import Schedule
@@ -15,22 +17,16 @@ def home(request) -> HttpResponse:
 
 
 def create_context_for_schedule(date:str,pin:str,slotId:uuid.UUID) -> dict:
-    now =  datetime.datetime.now() + datetime.timedelta(hours=Settings.load().unlock_hours)
+    now =  datetime.datetime.now() + datetime.timedelta(hours=get_object_or_404(Schedule,start_time__date=date).unlock_hours)
     context = {
         "kiosk":True,
         # "range_add_slots":range(2),
         "slot_id_from_cookies":slotId,
         "site":Settings.load(),
         # "now":datetime.datetime.now() + datetime.timedelta(hours=1)
-        "now":datetime.time(hour=now.hour,minute=now.minute)
+        "now":datetime.time(hour=now.hour,minute=now.minute),
+        "schedule":get_object_or_404(Schedule,start_time__date=date),
     }
-
-    schedules = list(Schedule.objects.filter(start_time__date=date))
-    if len(schedules)==1:
-        context['schedule']=schedules[0]
-
-        delta = schedules[0].end_time - schedules[0].start_time
-        # context["range_slots_left"] = range(int(delta.seconds/60/30) - 4) # simulate four elapsed slots
 
     if pin:
         if pin.isnumeric():
@@ -51,22 +47,34 @@ def schedule(request,date:str) -> HttpResponse:
 
     return response
 
-def clear_slot(request,date:str,slot_id:int) -> HttpResponse:
-    schedule = Schedule.objects.get(start_time__date=date)
-    slot = schedule.slots.get(id=slot_id)
-    slot.name = None
-    slot.slot_id = None
-    slot.save()
-    return HttpResponseRedirect(
-        redirect_to=f"/{date}?pin={request.POST.get("pin")}"
-    )
+def clear_slot(request,date:str,slot_id:int) -> HttpResponse|JsonResponse:
+    schedule = get_object_or_404(Schedule,start_time__date=date)
+    form = ReserveSlotForm(request.POST)
+    if form.is_valid():
+        if schedule.pin == form.cleaned_data["pin"]:
+            slot = schedule.slots.get(id=slot_id)
+            slot.name = None
+            slot.slot_id = None
+            slot.save()
+            return HttpResponseRedirect(
+                redirect_to=f"/{date}?pin={request.POST.get("pin")}"
+            )
+        else:
+            return JsonResponse({"error": "Invalid PIN"}, status=401)
 
-def reserve_slot(request,date:str,slot_id:int) -> HttpResponse:
-    schedule = Schedule.objects.get(start_time__date=date)
-    slot = schedule.slots.get(id=slot_id)
-    slot.name = request.POST.get("name")
-    slot.slot_id = request.COOKIES.get('drummerei_slotId')
-    slot.save()
-    return HttpResponseRedirect(
-        redirect_to=f"/{date}?pin={request.POST.get("pin")}"
-    )
+def reserve_slot(request,date:str,slot_id:int) -> HttpResponse|JsonResponse:
+    form = ReserveSlotForm(request.POST)
+    if form.is_valid():
+        schedule = get_object_or_404(Schedule,start_time__date=date)
+        if schedule.pin == form.cleaned_data["pin"]:
+            slot = schedule.slots.get(id=slot_id)
+            slot.name = request.POST.get("name")
+            slot.slot_id = request.COOKIES.get('drummerei_slotId')
+            slot.save()
+            return HttpResponseRedirect(
+                redirect_to=f"/{date}?pin={request.POST.get("pin")}"
+            )
+        else:
+            return JsonResponse({"error": "Invalid PIN"}, status=401)
+    else:
+        return JsonResponse({"error": "Invalid form data"}, status=400)
