@@ -10,7 +10,7 @@
         </div>
     {% else %}
 
-        {% if slot.start_time < now  %}
+        {% if not slot.is_available  %}
             <div class="col p-0 m-0">
                 {% include './form_locked.html' %}
             </div>
