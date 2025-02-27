@@ -1,5 +1,5 @@
 <form   method="POST"
-        action="/{{schedule}}/slots/{{slot.id}}/clear"
+        action="/{{schedule}}/slots/{{slot.id}}/edit"
         class="col p-0 m-0 input-group">
     {% csrf_token %}
     <input  type="text"
@@ -13,9 +13,9 @@
     <input type="hidden" name="time" value="{{slot.start_time|date:'H:i'}}"/>
     <input type="hidden" name="pin" value="{{schedule.pin}}"/>
 
-    <button class="btn btn-dark text-danger fw-bold"
-            type="submit"
+    <input class="btn btn-dark text-warning fw-bold "
+            type="submit" name="update" value="UPDATE"/>
+    <input class="btn btn-dark text-danger fw-bold border-danger border-2"
+            type="submit" name="clear" value="CLEAR"
     >
-    CLEAR
-    </button>
 </form>

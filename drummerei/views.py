@@ -47,20 +47,25 @@ def schedule(request,date:str) -> HttpResponse:
 
     return response
 
-def clear_slot(request,date:str,slot_id:int) -> HttpResponse|JsonResponse:
+def edit_slot(request,date:str,slot_id:int) -> HttpResponse|JsonResponse:
     schedule = get_object_or_404(Schedule,start_time__date=date)
     form = ReserveSlotForm(request.POST)
     if form.is_valid():
         if schedule.pin == form.cleaned_data["pin"]:
-            slot = schedule.slots.get(id=slot_id)
-            slot.name = None
-            slot.slot_id = None
-            slot.save()
+            if request.POST.get("clear"):
+                slot = schedule.slots.get(id=slot_id)
+                slot.name = None
+                slot.slot_id = None
+                slot.save()
+            if request.POST.get("update"):
+                slot = schedule.slots.get(id=slot_id)
+                slot.name = request.POST.get("name")
+                slot.save()
             return HttpResponseRedirect(
                 redirect_to=f"/{date}?pin={request.POST.get("pin")}"
             )
-        else:
-            return JsonResponse({"error": "Invalid PIN"}, status=401)
+    else:
+        return JsonResponse({"error": "Invalid PIN"}, status=401)
 
 def reserve_slot(request,date:str,slot_id:int) -> HttpResponse|JsonResponse:
     form = ReserveSlotForm(request.POST)

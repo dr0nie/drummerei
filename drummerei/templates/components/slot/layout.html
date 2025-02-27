@@ -18,7 +18,7 @@
 
             {% if slot.slot_id|slugify == slot_id_from_cookies %}    
                 <div class="col p-0 m-0">
-                    {% include './form_clear.html' %}
+                    {% include './form_edit.html' %}
                 </div>
             {% else %}
                 {% if slot.slot_id != None %}
