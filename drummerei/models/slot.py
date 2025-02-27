@@ -1,4 +1,5 @@
-from datetime import time
+from datetime import time, datetime, timedelta
+from enum import Enum
 from uuid import UUID,uuid4
 
 from django.db import models
@@ -37,9 +38,36 @@ class Slot(models.Model):
     start_time = models.TimeField(default=generate_start_time)
     slot_id = models.UUIDField(null=True, blank=True)
 
-    def is_locked(self) -> bool:
-        number_available_slots=2
-        return False
+    class Status(Enum):
+        AVAILABLE = 1
+        UNAVAILABLE = 2
+        RESERVED = 3
+
+    def get_status(self) -> Status:
+        if self.is_locked():
+            return self.Status.UNAVAILABLE
+        elif self.slot_id is None:
+            return self.Status.RESERVED
+        else:
+            return self.Status.AVAILABLE
+
+    def is_reserved(self) -> bool:
+        return self.slot_id is not None
+
+    def is_available(self) -> bool:
+        if self.schedule_set.count() > 0: # exists()
+            schedule = self.schedule_set.first()
+            time_limit = datetime.now() + timedelta(
+                        hours=schedule.unlock_hours
+                    )
+            slot_start_time = datetime.combine(
+                            datetime.now(),
+                            self.start_time
+                        )
+            return slot_start_time > datetime.now() and slot_start_time < time_limit #and not self.is_reserved()
+
+        else:
+            raise ValueError("Slot is not assigned to any schedule")
 
     def reserve(self, name: str) -> UUID:
         """

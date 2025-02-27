@@ -72,12 +72,10 @@ class Schedule(models.Model):
         else:
             schedules = list(self.__class__.objects.filter(id=self.id))
             old_schedule = schedules[0]
-            oldpin = old_schedule.pin
-            if self.pin != oldpin:
+            if self.pin != old_schedule.pin:
                 self.generate_qrcode(qrcode_path)
 
-            old_end_time = old_schedule.end_time
-            if self.end_time != old_end_time:
+            if self.end_time != old_schedule.end_time:
                 #TODO: update slots
                 pass
             super().save(*args, **kwargs)
@@ -151,10 +149,12 @@ class Schedule(models.Model):
         for i in range(number_of_slots):
             slot = Slot(
                 start_time=(
-                    datetime.combine(
-                        datetime(1, 1, 1),
-                        Settings.load().default_start_time
-                    ) + timedelta(minutes=i * 30)
+                    self.start_time
+                    # datetime.combine(
+                    #     datetime(1, 1, 1),
+                    #     Settings.load().default_start_time
+                    # )
+                      + timedelta(minutes=i * 30)
                 ).time()
             )
             slot.save()
